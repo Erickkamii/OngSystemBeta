@@ -41,3 +41,65 @@ button {
 button:hover {
   background-color: #45a049;
 }
+
+/* Personalizando Ant Design components */
+.ant-btn {
+  background-color: #007bff; /* Azul para os botões */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.ant-btn:hover {
+  background-color: #0056b3; /* Hover azul escuro */
+}
+
+.ant-input {
+  border-radius: 5px;
+  border: 1px solid #007bff;
+  padding: 10px;
+}
+
+.ant-input:focus {
+  border-color: #0056b3; /* Mudando a cor de foco para azul escuro */
+}
+
+.ant-card {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.ant-card-head {
+  background-color: #007bff;
+  color: white;
+}
+
+.ant-card-body {
+  background-color: white;
+  color: black;
+}
+
+.ant-form-item {
+  margin-bottom: 20px;
+}
+
+/* Alinhamento centralizado para o formulário */
+.ant-form {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Estilo para links */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+.centered-heading {
+  text-align: center;
+}

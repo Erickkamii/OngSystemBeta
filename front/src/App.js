@@ -1,147 +1,266 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { Button, Form, Input, Modal, List, notification } from 'antd';
-import 'antd/dist/antd.css';  // Importando o CSS do Ant Design
-import './App.css';  // CSS customizado
+import { Button, Input, Form, Select, Table } from 'antd';
+import './App.css';
 
-const App = () => {
-  const [formOng] = Form.useForm();
-  const [formVoluntario] = Form.useForm();
-  const [showOngForm, setShowOngForm] = useState(true);
-  const [showVoluntarioForm, setShowVoluntarioForm] = useState(true);
-  const [usuarios, setUsuarios] = useState([]);
+function App() {
+  const [showForm, setShowForm] = useState({
+    ong: false,
+    voluntario: false,
+    doacao: false,
+    evento: false,
+    habilidade: false,
+    voluntarioHabilidade: false,
+    usuario: false,
+  });
+
+  const [ongs, setOngs] = useState([]);
+  const [voluntarios, setVoluntarios] = useState([]);
   const [doacoes, setDoacoes] = useState([]);
   const [eventos, setEventos] = useState([]);
   const [habilidades, setHabilidades] = useState([]);
+  const [voluntarioHabilidades, setVoluntarioHabilidades] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
 
-  // Funções de envio de dados
-  const handleSubmitOng = async (values) => {
-    try {
-      await axios.post('http://localhost:8080/api/ongs', values);
-      notification.success({ message: 'Ong cadastrada com sucesso!' });
-      formOng.resetFields();
-    } catch (error) {
-      console.error('Erro ao cadastrar ONG:', error);
-      notification.error({ message: 'Erro ao cadastrar ONG' });
+  // Funções de submit
+  const handleSubmit = (type, values) => {
+    switch (type) {
+      case 'ong':
+        setOngs([...ongs, values]);
+        break;
+      case 'voluntario':
+        setVoluntarios([...voluntarios, values]);
+        break;
+      case 'doacao':
+        setDoacoes([...doacoes, values]);
+        break;
+      case 'evento':
+        setEventos([...eventos, values]);
+        break;
+      case 'habilidade':
+        setHabilidades([...habilidades, values]);
+        break;
+      case 'voluntarioHabilidade':
+        setVoluntarioHabilidades([...voluntarioHabilidades, values]);
+        break;
+      case 'usuario':
+        setUsuarios([...usuarios, values]);
+        break;
+      default:
+        break;
     }
+    setShowForm((prev) => ({ ...prev, [type]: false }));
   };
 
-  const handleSubmitVoluntario = async (values) => {
-    try {
-      await axios.post('http://localhost:8080/api/voluntarios', values);
-      notification.success({ message: 'Voluntário cadastrado com sucesso!' });
-      formVoluntario.resetFields();
-    } catch (error) {
-      console.error('Erro ao cadastrar Voluntário:', error);
-      notification.error({ message: 'Erro ao cadastrar Voluntário' });
-    }
-  };
+  // Definindo as colunas das tabelas para listagem
+  const ongColumns = [
+    { title: 'Nome da ONG', dataIndex: 'nome', key: 'nome' },
+    { title: 'CNPJ', dataIndex: 'cnpj', key: 'cnpj' },
+    { title: 'Descrição', dataIndex: 'descricao', key: 'descricao' },
+  ];
 
-  const fetchData = async (url, setState) => {
-    try {
-      const response = await axios.get(url);
-      setState(response.data);
-    } catch (error) {
-      console.error('Erro ao buscar dados:', error);
-    }
-  };
+  const voluntarioColumns = [
+    { title: 'Nome', dataIndex: 'nome', key: 'nome' },
+    { title: 'CPF', dataIndex: 'cpf', key: 'cpf' },
+  ];
 
-  // Funções para exibir as listas
-  const showUsuarios = () => fetchData('http://localhost:8080/api/usuarios', setUsuarios);
-  const showDoacoes = () => fetchData('http://localhost:8080/api/doacoes', setDoacoes);
-  const showEventos = () => fetchData('http://localhost:8080/api/eventos', setEventos);
-  const showHabilidades = () => fetchData('http://localhost:8080/api/habilidades', setHabilidades);
+  const doacaoColumns = [
+    { title: 'Valor', dataIndex: 'valor', key: 'valor' },
+    { title: 'Data da Doação', dataIndex: 'dataDoacao', key: 'dataDoacao' },
+    { title: 'ONG', dataIndex: 'ong', key: 'ong' },
+    { title: 'Voluntário', dataIndex: 'voluntario', key: 'voluntario' },
+  ];
+
+  const eventoColumns = [
+    { title: 'Título', dataIndex: 'titulo', key: 'titulo' },
+    { title: 'Data', dataIndex: 'data', key: 'data' },
+    { title: 'Estado', dataIndex: 'estado', key: 'estado' },
+    { title: 'Cidade', dataIndex: 'cidade', key: 'cidade' },
+    { title: 'Descrição', dataIndex: 'descricao', key: 'descricao' },
+    { title: 'Período', dataIndex: 'periodo', key: 'periodo' },
+  ];
+
+  const habilidadeColumns = [
+    { title: 'Descrição', dataIndex: 'descricao', key: 'descricao' },
+  ];
+
+  const voluntarioHabilidadeColumns = [
+    { title: 'Voluntário', dataIndex: 'voluntario', key: 'voluntario' },
+    { title: 'Habilidade', dataIndex: 'habilidade', key: 'habilidade' },
+  ];
+
+  const usuarioColumns = [
+    { title: 'Nome', dataIndex: 'nome', key: 'nome' },
+    { title: 'Email', dataIndex: 'email', key: 'email' },
+  ];
 
   return (
     <div className="App">
-      <h1>Cadastrar Novo Registro</h1>
-      
-      {/* Formulário de Cadastro de ONG */}
-      {showOngForm && (
-        <Form form={formOng} onFinish={handleSubmitOng} layout="vertical">
-          <h2>Cadastrar ONG</h2>
-          <Form.Item label="CNPJ" name="cnpj" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Descrição" name="descricao" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Button type="primary" htmlType="submit">Cadastrar ONG</Button>
-        </Form>
-      )}
+      <h1>Sistema de ONGs e Voluntários</h1>
+      <h2 classname="center-heading">Acompanhe nossos eventos e doações</h2>
 
-      {/* Formulário de Cadastro de Voluntário */}
-      {showVoluntarioForm && (
-        <Form form={formVoluntario} onFinish={handleSubmitVoluntario} layout="vertical">
-          <h2>Cadastrar Voluntário</h2>
-          <Form.Item label="CPF" name="cpf" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Button type="primary" htmlType="submit">Cadastrar Voluntário</Button>
-        </Form>
-      )}
-
-      {/* Botões para exibir as listas */}
       <div>
-        <Button onClick={showUsuarios}>Listar Usuários</Button>
-        <Button onClick={showDoacoes}>Listar Doações</Button>
-        <Button onClick={showEventos}>Listar Eventos</Button>
-        <Button onClick={showHabilidades}>Listar Habilidades</Button>
+        {Object.keys(showForm).map((key) => (
+          <Button
+            key={key}
+            onClick={() => setShowForm((prev) => ({ ...prev, [key]: !prev[key] }))}
+            type="primary"
+          >
+            {showForm[key] ? `Cancelar Cadastro ${key}` : `Cadastrar ${key}`}
+          </Button>
+        ))}
       </div>
 
-      {/* Modal para exibir a lista de Usuários */}
-      <Modal
-        title="Usuários Cadastrados"
-        visible={usuarios.length > 0}
-        onCancel={() => setUsuarios([])}
-        footer={null}
-      >
-        <List
-          dataSource={usuarios}
-          renderItem={(item) => <List.Item>{item.nome}</List.Item>}
-        />
-      </Modal>
+      {/* Formulários de Cadastro */}
 
-      {/* Modal para exibir a lista de Doações */}
-      <Modal
-        title="Doações Registradas"
-        visible={doacoes.length > 0}
-        onCancel={() => setDoacoes([])}
-        footer={null}
-      >
-        <List
-          dataSource={doacoes}
-          renderItem={(item) => <List.Item>{`Valor: R$${item.valor} | Data: ${item.dataDoacao}`}</List.Item>}
-        />
-      </Modal>
+      {showForm.usuario && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('usuario', values)}>
+          <h2>Cadastro de Usuário</h2>
+          <Form.Item label="Nome" name="nome" rules={[{ required: true, message: 'Por favor, insira o nome!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Por favor, insira o email!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Usuário
+          </Button>
+        </Form>
+      )}
 
-      {/* Modal para exibir a lista de Eventos */}
-      <Modal
-        title="Eventos Cadastrados"
-        visible={eventos.length > 0}
-        onCancel={() => setEventos([])}
-        footer={null}
-      >
-        <List
-          dataSource={eventos}
-          renderItem={(item) => <List.Item>{item.titulo}</List.Item>}
-        />
-      </Modal>
+      {showForm.ong && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('ong', values)}>
+          <h2>Cadastro de ONG</h2>
+          <Form.Item label="CNPJ" name="cnpj" rules={[{ required: true, message: 'Por favor, insira o CNPJ!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Descrição" name="descricao" rules={[{ required: true, message: 'Por favor, insira a descrição!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar ONG
+          </Button>
+        </Form>
+      )}
 
-      {/* Modal para exibir a lista de Habilidades */}
-      <Modal
-        title="Habilidades Registradas"
-        visible={habilidades.length > 0}
-        onCancel={() => setHabilidades([])}
-        footer={null}
-      >
-        <List
-          dataSource={habilidades}
-          renderItem={(item) => <List.Item>{item.descricao}</List.Item>}
-        />
-      </Modal>
+      {showForm.voluntario && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('voluntario', values)}>
+          <h2>Cadastro de Voluntário</h2>
+          <Form.Item label="CPF" name="cpf" rules={[{ required: true, message: 'Por favor, insira o CPF!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Voluntário
+          </Button>
+        </Form>
+      )}
+
+      {showForm.doacao && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('doacao', values)}>
+          <h2>Cadastro de Doação</h2>
+          <Form.Item label="Valor" name="valor" rules={[{ required: true, message: 'Por favor, insira o valor da doação!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Data da Doação" name="dataDoacao" rules={[{ required: true, message: 'Por favor, insira a data da doação!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Doação
+          </Button>
+        </Form>
+      )}
+
+      {showForm.evento && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('evento', values)}>
+          <h2>Cadastro de Evento</h2>
+          <Form.Item label="Título" name="titulo" rules={[{ required: true, message: 'Por favor, insira o título!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Data" name="data" rules={[{ required: true, message: 'Por favor, insira a data!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Estado" name="estado" rules={[{ required: true, message: 'Por favor, insira o estado!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Cidade" name="cidade" rules={[{ required: true, message: 'Por favor, insira a cidade!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Descrição" name="descricao" rules={[{ required: true, message: 'Por favor, insira a descrição!' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item label="Período" name="periodo" rules={[{ required: true, message: 'Por favor, insira o período!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Evento
+          </Button>
+        </Form>
+      )}
+
+      {showForm.habilidade && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('habilidade', values)}>
+          <h2>Cadastro de Habilidade</h2>
+          <Form.Item label="Descrição" name="descricao" rules={[{ required: true, message: 'Por favor, insira a descrição!' }]}>
+            <Input />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Habilidade
+          </Button>
+        </Form>
+      )}
+
+      {showForm.voluntarioHabilidade && (
+        <Form layout="vertical" onFinish={(values) => handleSubmit('voluntarioHabilidade', values)}>
+          <h2>Cadastro de Voluntário-Habilidade</h2>
+          <Form.Item label="Voluntário" name="voluntario" rules={[{ required: true, message: 'Por favor, selecione o voluntário!' }]}>
+            <Select>
+              {voluntarios.map((voluntario) => (
+                <Select.Option key={voluntario.cpf} value={voluntario.cpf}>
+                  {voluntario.nome}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Habilidade" name="habilidade" rules={[{ required: true, message: 'Por favor, selecione a habilidade!' }]}>
+            <Select>
+              {habilidades.map((habilidade) => (
+                <Select.Option key={habilidade.descricao} value={habilidade.descricao}>
+                  {habilidade.descricao}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Button type="primary" htmlType="submit">
+            Cadastrar Voluntário-Habilidade
+          </Button>
+        </Form>
+      )}
+
+      {/* Listagem dos dados */}
+      <h2>Listar Dados</h2>
+      <div>
+        <h3>ONGs</h3>
+        <Table dataSource={ongs} columns={ongColumns} rowKey="cnpj" />
+
+        <h3>Voluntários</h3>
+        <Table dataSource={voluntarios} columns={voluntarioColumns} rowKey="cpf" />
+
+        <h3>Doações</h3>
+        <Table dataSource={doacoes} columns={doacaoColumns} rowKey="dataDoacao" />
+
+        <h3>Eventos</h3>
+        <Table dataSource={eventos} columns={eventoColumns} rowKey="data" />
+
+        <h3>Habilidades</h3>
+        <Table dataSource={habilidades} columns={habilidadeColumns} rowKey="descricao" />
+
+        <h3>Voluntário-Habilidade</h3>
+        <Table dataSource={voluntarioHabilidades} columns={voluntarioHabilidadeColumns} rowKey="voluntario" />
+
+        <h3>Usuários</h3>
+        <Table dataSource={usuarios} columns={usuarioColumns} rowKey="email" />
+      </div>
     </div>
   );
-};
+}
 
 export default App;
