@@ -10,4 +10,12 @@ public class Voluntario extends Usuario {
     private String cpf;
 
     // Getters and Setters
+    
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
 }

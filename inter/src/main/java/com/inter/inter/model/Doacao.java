@@ -29,4 +29,43 @@ public class Doacao {
 
     // Getters and Setters
     
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Ong getOng() {
+        return ong;
+    }
+
+    public void setOng(Ong ong) {
+        this.ong = ong;
+    }
+
+    public Voluntario getVoluntario() {
+        return voluntario;
+    }
+
+    public void setVoluntario(Voluntario voluntario) {
+        this.voluntario = voluntario;
+    }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
+    public Date getDataDoacao() {
+        return dataDoacao;
+    }
+
+    public void setDataDoacao(Date dataDoacao) {
+        this.dataDoacao = dataDoacao;
+    }
 }
